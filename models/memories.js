@@ -23,6 +23,4 @@ const memorySchema = new Schema({
     }
 )
 
-var Memories = mongoose.model('Memory',memorySchema)
-
-module.exports = Memories
+module.exports = mongoose.model('Memory',memorySchema)

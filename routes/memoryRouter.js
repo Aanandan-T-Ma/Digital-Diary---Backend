@@ -17,3 +17,5 @@ memoryRouter.route('/:userId')
 .post((req, res, next) => {
     
 })
+
+module.exports = memoryRouter
