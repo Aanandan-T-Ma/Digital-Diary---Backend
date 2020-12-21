@@ -7,8 +7,7 @@ const User = require('../models/users')
 const userRouter = express.Router()
 userRouter.use(bodyParser.json())
 
-userRouter.route('/') 
-.get((req, res, next) => {
+userRouter.get('/', (req, res, next) => {
     User.find({})
       .then((users) => {
           res.status(200).send(users)
@@ -16,19 +15,17 @@ userRouter.route('/')
       .catch((err) => next(err))
 })
 
-userRouter.route('/signup')
-.post((req, res, next) => {
+userRouter.post('/signup', (req, res, next) => {
     User.find({})
       .then(async (users) => {
-          var user = users.filter(user => user.username === req.body.username)[0]
+          var user = users.filter(user => user.userId === req.body.userId)[0]
           if(user)
             res.status(400).send("Username already exists!")
           else{
             const salt = await bcrpyt.genSalt()
             const hashedPassword = await bcrpyt.hash(req.body.password, salt)
-            console.log(salt + "\n" + hashedPassword)
             user = { 
-                username: req.body.username, 
+                userId: req.body.userId, 
                 password: hashedPassword
             }
             User.create(user)
@@ -44,9 +41,8 @@ userRouter.route('/signup')
       .catch((err) => next(err))
 })
 
-userRouter.route('/login')
-.post((req, res, next) => {
-    User.findOne({ username: req.body.username })
+userRouter.post('/login', (req, res, next) => {
+    User.findOne({ userId: req.body.userId })
       .then(async (user) => {
           if(user){
             if(await bcrpyt.compare(req.body.password, user.password))
