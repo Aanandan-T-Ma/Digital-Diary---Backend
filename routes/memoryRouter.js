@@ -40,7 +40,10 @@ memoryRouter.route('/:memoryId')
 .get((req, res, next) => {
    Memories.findOne({ userId: req.body.userId, _id: req.params.memoryId })
      .then((memory) => {
-        res.status(200).send(memory)
+        if(memory) 
+          res.status(200).send(memory)
+        else
+          res.sendStatus(404)
      }, (err) => next(err))
      .catch((err) => next(err))
 })
