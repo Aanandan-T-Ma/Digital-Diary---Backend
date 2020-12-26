@@ -6,6 +6,14 @@ const User = new Schema({
         type: String,
         required: true
     },
+    email: {
+        type: String,
+        required: true
+    },
+    name: {
+        type: String,
+        required: true
+    },
     password: {
         type: String,
         required: true
@@ -13,6 +21,12 @@ const User = new Schema({
     admin: {
         type: Boolean,
         default: false
+    },
+    otp: {
+        type: String
+    },
+    activated: {
+        type: Boolean
     }
 },{
     timestamps: true

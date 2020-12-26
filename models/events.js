@@ -18,6 +18,10 @@ const eventSchema = new Schema({
         type: String,
         required: true
     },
+    type: {
+        type: String,
+        default: "once"
+    },
     userId: {
         type: String,
         required: true
