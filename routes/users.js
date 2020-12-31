@@ -2,14 +2,13 @@ const express = require('express')
 const bodyParser = require('body-parser')
 const bcrpyt = require('bcrypt')
 const nodemailer = require('nodemailer')
-const cors = require('./cors')
 
 const User = require('../models/users')
 
 const userRouter = express.Router()
 userRouter.use(bodyParser.json())
 
-userRouter.get('/', cors.corsWithOptions, (req, res, next) => {
+userRouter.get('/', (req, res, next) => {
     User.find({})
       .then((users) => {
           res.status(200).send(users)
@@ -17,7 +16,7 @@ userRouter.get('/', cors.corsWithOptions, (req, res, next) => {
       .catch((err) => next(err))
 })
 
-userRouter.post('/signup', cors.corsWithOptions, (req, res, next) => {
+userRouter.post('/signup', (req, res, next) => {
     User.findOne({ email: req.body.email })
       .then(async (user) => {
           if(user)
@@ -53,7 +52,7 @@ userRouter.post('/signup', cors.corsWithOptions, (req, res, next) => {
 	  .catch((err) => next(err))
 })
 
-userRouter.post('/login', cors.corsWithOptions, (req, res, next) => {
+userRouter.post('/login', (req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers,X-Access-Token,XKey,Authorization');
@@ -87,7 +86,7 @@ userRouter.post('/login', cors.corsWithOptions, (req, res, next) => {
       .catch((err) => next(err))
 })
 
-userRouter.post('/otp', cors.corsWithOptions, (req, res, next) => {
+userRouter.post('/otp', (req, res, next) => {
 	User.findOne({ userId: req.body.userId })
 	  .then(async (user) => {
 		  if(await bcrpyt.compare(req.body.otp, user.otp)){
