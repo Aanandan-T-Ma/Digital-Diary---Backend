@@ -6,6 +6,14 @@ const memoryRouter = express.Router()
 
 memoryRouter.use(bodyParser.json())
 
+memoryRouter.post('/all', (req, res, next) => {
+   Memories.find({ userId: req.body.userId })
+     .then((memories) => {
+        res.status(200).send(memories)
+     }, (err) => next(err))
+     .catch((err) => next(err))
+})
+
 memoryRouter.route('/')
 .get((req, res, next) => {
    Memories.find({ userId: req.body.userId })

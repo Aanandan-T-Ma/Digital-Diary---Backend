@@ -6,6 +6,14 @@ const eventRouter = express.Router()
 
 eventRouter.use(bodyParser.json())
 
+eventRouter.post('/all', (req, res, next) => {
+   Events.find({ userId: req.body.userId })
+     .then((events) => {
+        res.status(200).send(events)
+     }, (err) => next(err))
+     .catch((err) => next(err))
+})
+
 eventRouter.route('/')
 .get((req, res, next) => {
    Events.find({ userId: req.body.userId })
