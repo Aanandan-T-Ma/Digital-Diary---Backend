@@ -17,68 +17,71 @@ userRouter.get('/', (req, res, next) => {
 })
 
 userRouter.post('/signup', (req, res, next) => {
-    User.findOne({ email: req.body.email })
-      .then(async (user) => {
-          if(user)
-            res.status(400).send("Email already registered!")
-          else{
-            const salt = await bcrpyt.genSalt()
-            const hashedPassword = await bcrpyt.hash(req.body.password, salt)
-            const userId = req.body.email.substring(0,req.body.email.indexOf("@"))
-            var otp = ""
-            for(var i=1;i<=6;i++) 
-              otp += Math.floor(Math.random() * 10)
-            const hashedOtp = await bcrpyt.hash(otp, 10)
-            user = { 
-                userId: userId, 
-                email: req.body.email,
-                name: req.body.name,
-                password: hashedPassword,
-                otp: hashedOtp,
-                activated: false
-            }
-            User.create(user)
-             .then((user) => {
-               User.findById(user._id)
-                 .then((user) => {
-                    sendEmail(req.body.email, otp)
-                    res.status(200).send(user)
-                  }) 
-                  .catch((err) => next(err))
-              }, (err) => next(err))
-             .catch((err) => next(err))
-          }
+    User.findOne({ username: req.body.username })
+      .then((user) => {
+        if(user)
+          res.status(200).send("Username already exists!")
+        else {
+          User.findOne({ email: req.body.email })
+            .then(async (user) => {
+                if(user)
+                  res.status(200).send("Email already registered!")
+                else{
+                  const salt = await bcrpyt.genSalt()
+                  const hashedPassword = await bcrpyt.hash(req.body.password, salt)
+                  var otp = ""
+                  for(var i=1;i<=6;i++) 
+                    otp += Math.floor(Math.random() * 10)
+                  const hashedOtp = await bcrpyt.hash(otp, 10)
+                  user = { 
+                      username: req.body.username,
+                      password: hashedPassword,
+                      email: req.body.email,
+                      otp: hashedOtp,
+                      activated: false
+                  }
+                  User.create(user)
+                   .then((user) => {
+                     User.findById(user._id)
+                       .then((user) => {
+                          sendEmail(req.body.email, otp)
+                          res.status(200).send(user)
+                        }) 
+                        .catch((err) => next(err))
+                    }, (err) => next(err))
+                   .catch((err) => next(err))
+                }
+            }, (err) => next(err))
+          .catch((err) => next(err))
+        }
       }, (err) => next(err))
-	  .catch((err) => next(err))
+      .catch((err) => next(err))
 })
 
 userRouter.post('/login', (req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Access-Control-Allow-Headers, Origin,Accept, X-Requested-With, Content-Type, Access-Control-Request-Method, Access-Control-Request-Headers,X-Access-Token,XKey,Authorization');
-    User.findOne({ userId: req.body.userId })
+    User.findOne({ username: req.body.userId })
       .then(async (user) => {
           if(user){
             if(!user.activated)
-              res.status(400).send({msg: "Invalid User"})
+              res.status(200).send({resCode: -1})
             else if(await bcrpyt.compare(req.body.password, user.password))
-              res.status(200).send({msg: "Login Success"})
+              res.status(200).send({resCode: 1, userId: user._id, username: user.username})
             else
-              res.status(400).send({msg: "Invalid Password"})
+              res.status(200).send({resCode: 0})
           }
           else{
             User.findOne({ email: req.body.userId })
               .then(async (user) => {
                 if(user){
                   if(!user.activated)
-                    res.status(400).send({msg: "Invalid User"})
+                    res.status(200).send({resCode: -1})
                   else if(await bcrpyt.compare(req.body.password, user.password))
-                    res.status(200).send({msg: "Login Success"})
+                    res.status(200).send({resCode: 1, userId: user._id, username: user.username})
                   else
-                    res.status(400).send({msg: "Invalid Password"})
+                    res.status(200).send({resCode: 0})
                 }
                 else
-                  res.status(400).send({msg: "Invalid user!"})
+                  res.status(200).send({resCode: -1})
               }, (err) => next(err))
               .catch((err) => next(err))
           }
@@ -87,7 +90,7 @@ userRouter.post('/login', (req, res, next) => {
 })
 
 userRouter.post('/otp', (req, res, next) => {
-	User.findOne({ userId: req.body.userId })
+	User.findOne({ _id: req.body.userId })
 	  .then(async (user) => {
 		  if(await bcrpyt.compare(req.body.otp, user.otp)){
 			  user.activated = true
@@ -99,9 +102,9 @@ userRouter.post('/otp', (req, res, next) => {
 			   .catch((err) => next(err))
 		  }
 		  else
-		    res.status(400).send("Invalid OTP")
+		    res.status(200).send("Invalid OTP")
 	  }, (err) => next(err))
-      .catch((err) => next(err))
+    .catch((err) => next(err))
 })
 
 function sendEmail(receiver, otp){

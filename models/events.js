@@ -18,9 +18,9 @@ const eventSchema = new Schema({
         type: String,
         required: true
     },
-    type: {
-        type: String,
-        default: "once"
+    once: {
+        type: Boolean,
+        default: true
     },
     userId: {
         type: String,
