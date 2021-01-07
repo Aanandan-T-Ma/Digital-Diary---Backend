@@ -112,7 +112,7 @@ function sendEmail(receiver, otp){
 		service: 'gmail',
 		auth: {
 		  user: 'aanandan.tma@gmail.com',
-		  pass: 'aanandankaachi'
+		  pass: '<password>'
 		}
 	})
 	const mailOptions = {
