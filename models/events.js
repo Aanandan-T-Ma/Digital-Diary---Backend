@@ -12,15 +12,15 @@ const eventSchema = new Schema({
     },
     time: {
         type: String,
-        required: true
+        required: false
     },
     description: {
         type: String,
-        required: true
+        required: false
     },
     once: {
         type: Boolean,
-        default: true
+        required: true
     },
     userId: {
         type: String,

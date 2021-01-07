@@ -59,8 +59,10 @@ eventRouter.route('/:eventId')
 	Events.updateOne({ userId: req.body.userId, _id: req.params.eventId }, 
 		{ $set: { 
 			title: req.body.title,
-			date: req.body.date,
-			description: req.body.description
+         date: req.body.date,
+         time: req.body.time,
+         description: req.body.description,
+         once: req.body.once
 		 }})
 	  .then((event) => {
 		 res.status(200).send(event)
