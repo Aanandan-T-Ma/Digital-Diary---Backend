@@ -18,14 +18,49 @@ userRouter.get('/', (req, res, next) => {
 
 userRouter.post('/signup', (req, res, next) => {
     User.findOne({ username: req.body.username })
-      .then((user) => {
-        if(user)
-          res.status(200).send("Username already exists!")
+      .then(async (user) => {
+        if(user){
+          if(user.activated || user.email !== req.body.email)
+            res.status(200).send("Username already exists!")
+          else {
+            var otp = ""
+            for(var i=1;i<=6;i++) 
+              otp += Math.floor(Math.random() * 10)
+            const hashedOtp = await bcrpyt.hash(otp, 10)
+            user.otp = hashedOtp
+            user.save()
+              .then((user) => {
+                User.findById(user._id)
+                  .then((user) => {
+                      sendEmail(user.email, otp)
+                      res.status(200).send(user)
+                  })
+              }, (err) => next(err))
+          }
+        }
         else {
           User.findOne({ email: req.body.email })
             .then(async (user) => {
-                if(user)
-                  res.status(200).send("Email already registered!")
+                if(user){
+                  if(user.activated)
+                    res.status(200).send("Email already registered!")
+                  else {
+                    var otp = ""
+                    for(var i=1;i<=6;i++) 
+                      otp += Math.floor(Math.random() * 10)
+                    const hashedOtp = await bcrpyt.hash(otp, 10)
+                    user.otp = hashedOtp
+                    user.username = req.body.username
+                    user.save()
+                      .then((user) => {
+                        User.findById(user._id)
+                          .then((user) => {
+                              sendEmail(req.body.email, otp)
+                              res.status(200).send(user)
+                          }); 
+                      }, (err) => next(err))
+                  }
+                }
                 else{
                   const salt = await bcrpyt.genSalt()
                   const hashedPassword = await bcrpyt.hash(req.body.password, salt)
