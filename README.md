@@ -1,4 +1,4 @@
-# Digital-Diary---Backend
+# Digital Diary Backend
 Server side scripts for the Digital Diary application using Express framework
 
 ## Quick Start
