@@ -152,12 +152,12 @@ function sendEmail(receiver, otp){
 	const transporter = nodemailer.createTransport({
 		service: 'gmail',
 		auth: {
-		  user: 'aanandan.tma@gmail.com',
+		  user: '<email>',
 		  pass: '<password>'
 		}
 	})
 	const mailOptions = {
-		from: 'aanandan.tma@gmail.com',
+		from: '<email>',
 		to: receiver,
 		subject: 'Digital Diary Account Activation',
 		text: 'Your OTP for account activation is ' + otp
